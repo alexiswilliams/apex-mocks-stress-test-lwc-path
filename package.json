@@ -1,0 +1,20 @@
+{
+  "name": "apex-mocks",
+  "version": "1.0.0",
+  "description": "Salesforce.com (SFDC) Apex mocking library comparison for unit tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "sh test.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jamessimone/apex-mocks-stress-test"
+  },
+  "author": "james.simone",
+  "license": "ISC",
+  "devDependencies": {
+    "sfdx-cli": "latest",
+    "prettier-plugin-apex": "latest",
+    "prettier": "latest"
+  }
+}
