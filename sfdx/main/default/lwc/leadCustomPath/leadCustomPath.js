@@ -4,9 +4,9 @@ import { getPicklistValues } from 'lightning/uiObjectInfoApi';
 import { getRecord, updateRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
-import QUOTE_OBJECT from '@salesforce/schema/Quote';
-import CUSTOM_DATE_FIELD from '@salesforce/schema/Quote.CustomDate__c';
-import STATUS_FIELD from '@salesforce/schema/Quote.Status';
+import LEAD_OBJECT from '@salesforce/schema/Lead';
+import CUSTOM_DATE_FIELD from '@salesforce/schema/Lead.CustomDate__c';
+import STATUS_FIELD from '@salesforce/schema/Lead.Status';
 
 const CLOSED = 'Closed';
 const CLOSED_CTA = 'Select Closed Status';
@@ -17,21 +17,21 @@ export default class CustomPath extends LightningElement {
   //start off with all @wire methods and dependencies
   //plus lifecycle methods
   @api recordId;
-  @wire(getObjectInfo, { objectApiName: QUOTE_OBJECT })
+  @wire(getObjectInfo, { objectApiName: LEAD_OBJECT })
   objectInfo;
 
   @wire(getRecord, {
     recordId: '$recordId',
     fields: [CUSTOM_DATE_FIELD, STATUS_FIELD]
   })
-  quote({ data, error }) {
-    const quoteCb = (data) => {
-      this.status = this._getQuoteValueOrDefault(
+  lead({ data, error }) {
+    const leadCb = (data) => {
+      this.status = this._getLeadValueOrDefault(
         data,
         STATUS_FIELD.fieldApiName
       );
       this.storedStatus = this.status;
-      this.dateValue = this._getQuoteValueOrDefault(
+      this.dateValue = this._getLeadValueOrDefault(
         data,
         CUSTOM_DATE_FIELD.fieldApiName
       );
@@ -43,20 +43,19 @@ export default class CustomPath extends LightningElement {
       }
     };
 
-    this._handleWireCallback({ data, error, cb: quoteCb });
+    this._handleWireCallback({ data, error, cb: leadCb });
   }
 
   @wire(getPicklistValues, {
     recordTypeId: '$objectInfo.data.defaultRecordTypeId',
     fieldApiName: STATUS_FIELD
   })
-  quoteStatuses({ data, error }) {
-    const quoteStatusCb = (data) => {
+  leadStatuses({ data, error }) {
+    const leadStatusCb = (data) => {
       const statusList = [];
       data.values.forEach((picklistStatus) => {
-        console.log('value ' + picklistStatus.label + ' statusList.length ' + statusList.length);
-        console.log(picklistStatus.label.includes('Needs') + ' ' + picklistStatus.label);
-        if (picklistStatus.label != 'Needs Review') {
+        console.log('picklistStatus.label ' + picklistStatus.label);
+        if (!picklistStatus.label.includes(CLOSED)) {
           statusList.push(picklistStatus.label);
         }
       });
@@ -65,7 +64,6 @@ export default class CustomPath extends LightningElement {
 
       //now build the visible/closed statuses
       data.values.forEach((status) => {
-        console.log('status.label ' + status.label);
         if (status.label.includes(CLOSED)) {
           this.closedStatuses.push({
             label: status.label,
@@ -76,14 +74,13 @@ export default class CustomPath extends LightningElement {
             //so that the combobox can show a sensible default
             this.currentClosedStatus = status.label;
           }
-        } else if(status.label == 'Draft' || status.label == 'In Review' || status.label == 'Approved' || status.label == 'Offer' || status.label == 'Accepted' || status.label == 'Booked'){
-          
+        } else {
           this.visibleStatuses.push(this._getPathItemFromStatus(status.label));
         }
       });
       this.visibleStatuses.push(this._getPathItemFromStatus(CLOSED));
     };
-    this._handleWireCallback({ data, error, cb: quoteStatusCb });
+    this._handleWireCallback({ data, error, cb: leadStatusCb });
   }
 
   renderedCallback() {
@@ -151,7 +148,7 @@ export default class CustomPath extends LightningElement {
     }, true);
     if (allValid) {
       this._toggleModal();
-      await this._saveQuoteAndToast();
+      await this._saveLeadAndToast();
     }
   };
 
@@ -203,14 +200,14 @@ export default class CustomPath extends LightningElement {
         //and the modal should be popped
         this._advanceToClosedStatus();
       } else {
-        await this._saveQuoteAndToast();
+        await this._saveLeadAndToast();
       }
     } else if (this.storedStatus.includes(CLOSED)) {
       //curses! they closed the modal
       //let's re-open it
       this._advanceToClosedStatus();
     } else {
-      await this._saveQuoteAndToast();
+      await this._saveLeadAndToast();
     }
   }
 
@@ -254,11 +251,11 @@ export default class CustomPath extends LightningElement {
     this.template.querySelector('c-modal').toggleModal();
   }
 
-  _getQuoteValueOrDefault(data, val) {
+  _getLeadValueOrDefault(data, val) {
     return data ? data.fields[val].displayValue : '';
   }
 
-  async _saveQuoteAndToast() {
+  async _saveLeadAndToast() {
     let error;
     try {
       this.status = this.storedStatus;
@@ -266,7 +263,7 @@ export default class CustomPath extends LightningElement {
         fields: {
           Id: this.recordId,
           Status: this.status,
-          CustomDate__c: null
+          gunpla__CustomDate__c: null
         }
       };
       if (this.dateValue && this.status === SPECIAL_STATUS) {
