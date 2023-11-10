@@ -1,24 +1,26 @@
 <!--
   @description       : 
-  @author            : alexis.williams@slalom.com
+  @author            : williams.alexis@salesforce.com
   @group             : 
-  @last modified on  : 11-07-2023
-  @last modified by  : alexis.williams@slalom.com
+  @last modified on  : 11-10-2023
+  @last modified by  : williams.alexis@salesforce.com
 -->
 <template>
-    <div class="slds-scoped-notification slds-media slds-media_center slds-theme_success" role="status">
-        <div class="slds-media__figure">
-            <span class="slds-icon_container slds-icon-utility-success" title="success">
-                <svg class="slds-icon slds-icon_small" aria-hidden="true">
-                    <use xlink:href="/assets/icons/utility-sprite/svg/symbols.svg#success"></use>
-                </svg>
-                <span class="slds-assistive-text">success</span>
-            </span>
+    <template lwc:if={subStatus}>
+        <div class={scopedNotificationOuterClass} role="status">
+            <div class="slds-media__figure">
+                <span class={scopedNotificationInnerClass} title={title}>
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xlink:href={icon}></use>
+                    </svg>
+                    <span class="slds-assistive-text">{subStatus}</span>
+                </span>
+            </div>
+            <div class="slds-media__body">
+                <p>This Quote is Booked Pending Conversion.
+                    <!-- <a href="#">_{subStatus}_</a> -->
+                </p>
+            </div>
         </div>
-        <div class="slds-media__body">
-            <p>It looks as if duplicates exist for this lead.
-                <a href="#">View Duplicates</a>
-            </p>
-        </div>
-    </div>
+    </template>
 </template>

@@ -1,0 +1,35 @@
+<!--
+  @description       : 
+  @author            : williams.alexis@salesforce.com
+  @group             : 
+  @last modified on  : 11-08-2023
+  @last modified by  : williams.alexis@salesforce.com
+-->
+<template>
+    <lightning-card title="WireGetFieldValue" icon-name="standard:account">
+      <template lwc:if={account.data}>
+        <div class="slds-m-around_medium">
+          <p>
+            <lightning-formatted-number format-style="currency" value={revenue} currency-code="USD">
+            </lightning-formatted-number>
+          </p>
+          <p>
+            <lightning-formatted-date-time
+              weekday="long"
+              month="short"
+              year="numeric"
+              day="2-digit"
+              hour="2-digit"
+              minute="2-digit"
+              value={created}
+            >
+            </lightning-formatted-date-time>
+          </p>
+          <p>{created}</p>
+          <p>
+            <lightning-formatted-date-time value={expiration}> </lightning-formatted-date-time>
+          </p>
+        </div>
+      </template>
+    </lightning-card>
+  </template>
